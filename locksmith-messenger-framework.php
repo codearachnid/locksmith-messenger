@@ -70,8 +70,12 @@ class LocksmithMessenger {
     return $response;
   }
   function makeCall( $to, $msg ){
-    $this->client->account->calls->create($to, $this->outbound_number,
-              [ 'twiml' => '<Response><Say>' . $msg . '</Say></Response>']
+    // protect for XML safe characters in the message
+    $msg = htmlspecialchars($msg, ENT_XML1, 'UTF-8');
+    $this->client->calls->create(
+      $to,
+      $this->outbound_number,
+      [ 'twiml' => sprintf( '<Response><Say>%s</Say></Response>', $msg )]
     );
   }
   function sendText( $to, $msg ){
